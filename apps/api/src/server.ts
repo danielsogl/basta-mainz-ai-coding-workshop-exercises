@@ -1,6 +1,7 @@
 import { createServer as createHttpServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { generateInvoice } from '@tickets/legacy-invoice';
 import { calculateOrderTotalCents } from '@tickets/pricing';
+import { Waitlists } from './waitlist.ts';
 
 export interface EventRecord {
   id: string;
@@ -50,6 +51,8 @@ export function createApp(): Server {
     availabilityCacheWarm = true;
   }, upstreamLatencyMs);
 
+  const waitlists = new Waitlists();
+
   async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const url = new URL(req.url ?? '/', 'http://localhost');
 
@@ -94,6 +97,31 @@ export function createApp(): Server {
         return;
       }
       sendJson(res, 200, { eventId: event.id, ...availabilityOf(event) });
+      return;
+    }
+
+    const waitlistMatch = /^\/events\/([^/]+)\/waitlist$/.exec(url.pathname);
+    if (waitlistMatch && (req.method === 'POST' || req.method === 'GET')) {
+      const event = seedEvents.find((candidate) => candidate.id === waitlistMatch[1]);
+      if (!event) {
+        sendJson(res, 404, { error: 'event not found' });
+        return;
+      }
+      if (req.method === 'GET') {
+        sendJson(res, 200, { eventId: event.id, length: waitlists.length(event.id) });
+        return;
+      }
+      const body = await readJsonBody(req);
+      if (typeof body.email !== 'string' || !body.email.includes('@')) {
+        sendJson(res, 400, { error: 'email must be a string containing @' });
+        return;
+      }
+      if (event.capacity - event.sold > 0) {
+        sendJson(res, 409, { error: 'event is not sold out' });
+        return;
+      }
+      const { position, created } = waitlists.join(event.id, body.email);
+      sendJson(res, created ? 201 : 200, { position });
       return;
     }
 

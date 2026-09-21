@@ -39,6 +39,6 @@ tickets is rejected, so nobody queues for something they could just buy.
 - Waitlist state lives per `createApp()` instance, like the availability cache.
 
 ## Tasks
-- [ ] T1 — In-memory waitlist store with join + length (AC1, AC2, AC3)
-- [ ] T2 — `POST /events/:id/waitlist` with validation (AC1–AC6)
-- [ ] T3 — `GET /events/:id/waitlist` (AC5, AC7)
+- [x] T1 — In-memory waitlist store with join + length (AC1, AC2, AC3)
+- [x] T2 — `POST /events/:id/waitlist` with validation (AC1–AC6)
+- [x] T3 — `GET /events/:id/waitlist` (AC5, AC7)
