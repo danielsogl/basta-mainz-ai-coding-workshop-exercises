@@ -1,0 +1,30 @@
+{
+  "name": "shi-ai-coding-masterclass-exercises",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Starter monorepo for the BASTA! Mainz AI-native SDLC workshop exercises (the \"Tickets\" project).",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:affected": "vitest run --changed",
+    "check": "npm run typecheck && npm run lint && npm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^5.0.0",
+    "@types/node": "^26.5.1",
+    "eslint": "^10.10.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.0",
+    "vitest": "^5.0.0"
+  }
+}
