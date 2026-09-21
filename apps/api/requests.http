@@ -36,3 +36,38 @@ POST {{base}}/invoices
 Content-Type: application/json
 
 { "customerName": "Dave", "items": [{ "description": "Ticket", "unitPrice": 50, "qty": 2 }] }
+
+# ─── Waitlist ─────────────────────────────────────────────────────────
+
+### Join the waitlist of a sold-out event (201, position 1)
+POST {{base}}/events/evt-1/waitlist
+Content-Type: application/json
+
+{ "email": "a@example.com" }
+
+### Join again with the same email (200, same position)
+POST {{base}}/events/evt-1/waitlist
+Content-Type: application/json
+
+{ "email": "a@example.com" }
+
+### Second person (201, position 2)
+POST {{base}}/events/evt-1/waitlist
+Content-Type: application/json
+
+{ "email": "b@example.com" }
+
+### Event is not sold out (409)
+POST {{base}}/events/evt-2/waitlist
+Content-Type: application/json
+
+{ "email": "a@example.com" }
+
+### Invalid email (400)
+POST {{base}}/events/evt-1/waitlist
+Content-Type: application/json
+
+{ "email": "not-an-email" }
+
+### Waitlist length
+GET {{base}}/events/evt-1/waitlist
