@@ -14,7 +14,7 @@ A contributor opened a PR that lets people leave the waitlist:
 ```sh
 git fetch origin
 git checkout pr/leave-waitlist
-git diff checkpoint/05-build...pr/leave-waitlist
+git diff origin/checkpoint/05-build...HEAD
 ```
 
 The PR also amends `docs/waitlist/spec.md`. **Three problems are hidden in it.**
@@ -22,7 +22,8 @@ The PR also amends `docs/waitlist/spec.md`. **Three problems are hidden in it.**
 ## Steps
 
 1. **Fresh session.** Invoke `review-against-spec` against
-   `checkpoint/05-build`. Do not tell it what to look for.
+   `origin/checkpoint/05-build` (the PR's base branch). Do not tell it what
+   to look for.
 2. Write down what it found.
 3. **Your turn.** Read the diff yourself, with the spec next to it. What did
    the agent miss? What did it find that you would have missed?
