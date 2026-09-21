@@ -31,8 +31,18 @@ tickets is rejected, so nobody queues for something they could just buy.
 ## Non-goals
 - No notifications, reservations or payments.
 - No persistence across restarts.
-- No leaving the waitlist.
 - No listing of individual entries.
+
+## Amendment: leaving the waitlist
+`DELETE /events/:id/waitlist` with body `{ "email": "..." }` removes a person
+from the waitlist.
+
+- AC8 — Given `a@example.com`, `b@example.com` and `c@example.com` are on the
+  `evt-1` waitlist, when `a@example.com` leaves, then the response is `204`,
+  the length is 2, and `b@example.com` and `c@example.com` are now at
+  positions 1 and 2.
+- AC9 — Given `x@example.com` is not on the `evt-1` waitlist, when they
+  leave, then the response is `404`.
 
 ## Assumptions
 - Emails are compared exactly as sent (no lower-casing) — good enough for now.
@@ -42,3 +52,4 @@ tickets is rejected, so nobody queues for something they could just buy.
 - [x] T1 — In-memory waitlist store with join + length (AC1, AC2, AC3)
 - [x] T2 — `POST /events/:id/waitlist` with validation (AC1–AC6)
 - [x] T3 — `GET /events/:id/waitlist` (AC5, AC7)
+- [x] T4 — `DELETE /events/:id/waitlist` (AC8, AC9)

@@ -101,7 +101,7 @@ export function createApp(): Server {
     }
 
     const waitlistMatch = /^\/events\/([^/]+)\/waitlist$/.exec(url.pathname);
-    if (waitlistMatch && (req.method === 'POST' || req.method === 'GET')) {
+    if (waitlistMatch && (req.method === 'POST' || req.method === 'GET' || req.method === 'DELETE')) {
       const event = seedEvents.find((candidate) => candidate.id === waitlistMatch[1]);
       if (!event) {
         sendJson(res, 404, { error: 'event not found' });
@@ -114,6 +114,14 @@ export function createApp(): Server {
       const body = await readJsonBody(req);
       if (typeof body.email !== 'string' || !body.email.includes('@')) {
         sendJson(res, 400, { error: 'email must be a string containing @' });
+        return;
+      }
+      if (req.method === 'DELETE') {
+        if (!waitlists.leave(event.id, body.email)) {
+          sendJson(res, 404, { error: 'not on the waitlist' });
+          return;
+        }
+        res.writeHead(204).end();
         return;
       }
       if (event.capacity - event.sold > 0) {

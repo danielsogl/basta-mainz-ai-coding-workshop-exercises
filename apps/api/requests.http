@@ -71,3 +71,11 @@ Content-Type: application/json
 
 ### Waitlist length
 GET {{base}}/events/evt-1/waitlist
+
+# ─── Leave the waitlist ──────────────────────────────────────────────────────
+
+### Leave (204)
+DELETE {{base}}/events/evt-1/waitlist
+Content-Type: application/json
+
+{ "email": "a@example.com" }

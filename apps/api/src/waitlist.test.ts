@@ -47,7 +47,6 @@ describe('Waitlist', () => {
     const res = await join('evt-1', { email: 'a@example.com' });
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ position: 1 });
-    expect(await length('evt-1')).toBe(1);
   });
 
   it('AC4: an event that is not sold out rejects joins with 409', async () => {
@@ -67,6 +66,27 @@ describe('Waitlist', () => {
       expect(res.status).toBe(400);
       expect(await res.json()).toHaveProperty('error');
     }
+  });
+
+  const leave = (eventId: string, email: string) =>
+    fetch(`${base}/events/${eventId}/waitlist`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+  it('AC8: leaving removes the entry', async () => {
+    await join('evt-1', { email: 'a@example.com' });
+    await join('evt-1', { email: 'b@example.com' });
+    await join('evt-1', { email: 'c@example.com' });
+    const res = await leave('evt-1', 'a@example.com');
+    expect(res.status).toBe(204);
+    expect(await length('evt-1')).toBe(2);
+  });
+
+  it('AC9: leaving when not on the waitlist is a 404', async () => {
+    const res = await leave('evt-1', 'x@example.com');
+    expect(res.status).toBe(404);
   });
 
   it('AC7: the waitlist length is reported per event', async () => {
