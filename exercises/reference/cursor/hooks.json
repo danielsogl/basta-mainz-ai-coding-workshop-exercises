@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [{ "command": "node exercises/reference/hooks/guard-edits.mjs", "failClosed": true }],
+    "stop": [{ "command": "node exercises/reference/hooks/verify-on-stop.mjs --cursor", "timeout": 120, "loop_limit": 3 }]
+  }
+}
