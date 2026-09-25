@@ -1,0 +1,27 @@
+# Proves the repo works on every OS the workshop room brings. The two known
+# failures (BASELINE:, FLAKY:) are skipped here, as in the Stop hook.
+# checkpoint/05-red is red on purpose and not built.
+name: CI
+on:
+  push:
+    branches: [main, 'checkpoint/0[2-4]-*', checkpoint/05-build, pr/leave-waitlist]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npx vitest run -t "^(?!.*(BASELINE|FLAKY):)"
