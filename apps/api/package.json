@@ -1,0 +1,14 @@
+{
+  "name": "@tickets/api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": "./src/server.ts",
+  "scripts": {
+    "start": "node src/index.ts"
+  },
+  "dependencies": {
+    "@tickets/legacy-invoice": "*",
+    "@tickets/pricing": "*"
+  }
+}

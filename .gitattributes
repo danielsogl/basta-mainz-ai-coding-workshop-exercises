@@ -1,0 +1,3 @@
+# Same line endings on every OS: diffs against the checkpoints and the
+# review PR stay clean on Windows with core.autocrlf=true.
+* text=auto eol=lf

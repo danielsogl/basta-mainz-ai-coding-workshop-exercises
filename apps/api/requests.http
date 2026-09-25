@@ -1,0 +1,35 @@
+# Tickets API: requests you can run from the editor.
+# Visual Studio, Rider and IntelliJ run this file as is; VS Code needs the
+# "REST Client" extension (humao.rest-client). Start the API first:
+#   npm start --workspace apps/api          (port 3000)
+#   PORT=3200 npm start --workspace apps/api   (if 3000 is taken; change @base)
+#   PowerShell: $env:PORT=3200; npm start --workspace apps/api
+
+@base = http://localhost:3000
+
+### Health (answers "healthy"; the BASELINE test expects "ok")
+GET {{base}}/health
+
+### Price for 2 tickets at 10.00 EUR, VAT included
+POST {{base}}/price
+Content-Type: application/json
+
+{ "unitPriceCents": 1000, "quantity": 2 }
+
+### Price with a promo code (10 % off)
+POST {{base}}/price
+Content-Type: application/json
+
+{ "unitPriceCents": 1000, "quantity": 2, "promoCode": "EARLY10" }
+
+### Availability: evt-1 is sold out
+GET {{base}}/events/evt-1/availability
+
+### Availability: evt-2 still has tickets
+GET {{base}}/events/evt-2/availability
+
+### Legacy invoice
+POST {{base}}/invoices
+Content-Type: application/json
+
+{ "customerName": "Dave", "items": [{ "description": "Ticket", "unitPrice": 50, "qty": 2 }] }
