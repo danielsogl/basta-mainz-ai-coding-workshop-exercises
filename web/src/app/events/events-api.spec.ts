@@ -30,4 +30,31 @@ describe('EventsApi', () => {
 
     expect(resource.value()).toEqual(events);
   });
+
+  it('loads the waitlist size of one event', async () => {
+    const resource = TestBed.runInInjectionContext(() => api.waitlist(() => 'evt-2'));
+    const request = await vi.waitFor(() => http.expectOne('/api/events/evt-2/waitlist'));
+    request.flush({ eventId: 'evt-2', length: 3 });
+    await TestBed.inject(ApplicationRef).whenStable();
+
+    expect(resource.value()).toEqual({ eventId: 'evt-2', length: 3 });
+  });
+
+  it('posts the email to the waitlist endpoint', async () => {
+    const joined = api.joinWaitlist('evt-2', 'ada@example.com');
+
+    const req = http.expectOne('/api/events/evt-2/waitlist');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ email: 'ada@example.com' });
+    req.flush({ position: 1 }, { status: 201, statusText: 'Created' });
+
+    await expect(joined).resolves.toEqual({ position: 1, alreadyOnList: false });
+  });
+
+  it('reports a repeated join (200) as already on the list', async () => {
+    const joined = api.joinWaitlist('evt-2', 'ada@example.com');
+    http.expectOne('/api/events/evt-2/waitlist').flush({ position: 1 }, { status: 200, statusText: 'OK' });
+
+    await expect(joined).resolves.toEqual({ position: 1, alreadyOnList: true });
+  });
 });

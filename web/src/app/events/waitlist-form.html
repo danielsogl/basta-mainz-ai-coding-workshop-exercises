@@ -1,0 +1,22 @@
+<p class="waiting" aria-live="polite">{{ waiting() }}</p>
+
+@if (joined(); as entry) {
+  <p class="joined" role="status">
+    @if (entry.alreadyOnList) {
+      You are already on the waitlist as #{{ entry.position }}.
+    } @else {
+      You are #{{ entry.position }} on the waitlist.
+    }
+  </p>
+} @else {
+  <form [formRoot]="waitlistForm">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" autocomplete="email" [formField]="waitlistForm.email" />
+      @for (error of waitlistForm.email().errors(); track error.kind) {
+        <mat-error>{{ error.message }}</mat-error>
+      }
+    </mat-form-field>
+    <button mat-flat-button type="submit" [disabled]="waitlistForm().submitting()">Join waitlist</button>
+  </form>
+}
