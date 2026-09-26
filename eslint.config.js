@@ -4,7 +4,8 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['node_modules', '**/dist', '.vitest'],
+    // web/ has its own Angular ESLint config (web/eslint.config.js).
+    ignores: ['node_modules', '**/dist', '.vitest', 'web'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -20,5 +21,5 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
     },
-  }
+  },
 );

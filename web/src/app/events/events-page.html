@@ -1,0 +1,51 @@
+<h1 class="mat-headline-small">Events</h1>
+
+@if (events.isLoading() && !events.hasValue()) {
+  <mat-progress-bar mode="indeterminate" aria-label="Loading events" />
+} @else if (events.error()) {
+  <mat-card appearance="outlined" class="error" role="alert">
+    <mat-card-header>
+      <mat-icon mat-card-avatar aria-hidden="true">cloud_off</mat-icon>
+      <mat-card-title>Could not load events</mat-card-title>
+      <mat-card-subtitle>Is the API running?</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Start it from the repo root:</p>
+      <pre><code>npm start --workspace apps/api</code></pre>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-flat-button type="button" (click)="events.reload()">Retry</button>
+    </mat-card-actions>
+  </mat-card>
+} @else {
+  <ul class="grid">
+    @for (event of events.value(); track event.id) {
+      <li>
+        <mat-card appearance="outlined" [attr.aria-label]="event.name">
+          <mat-card-header>
+            <mat-card-title>{{ event.name }}</mat-card-title>
+            <mat-card-subtitle>{{ event.sold }} of {{ event.capacity }} sold</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-progress-bar
+              mode="determinate"
+              [value]="(event.sold / event.capacity) * 100"
+              aria-label="Tickets sold"
+            />
+          </mat-card-content>
+          <mat-card-footer>
+            @if (event.soldOut) {
+              <mat-chip-set aria-label="Status">
+                <mat-chip class="sold-out">Sold out</mat-chip>
+              </mat-chip-set>
+            } @else {
+              <span class="available">{{ event.available }} left</span>
+            }
+          </mat-card-footer>
+        </mat-card>
+      </li>
+    } @empty {
+      <li>No events yet.</li>
+    }
+  </ul>
+}

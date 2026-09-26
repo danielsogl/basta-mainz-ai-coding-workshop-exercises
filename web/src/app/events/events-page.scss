@@ -1,0 +1,51 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: block;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 8px 16px 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+mat-card {
+  height: 100%;
+}
+
+mat-card-content {
+  padding-block: 16px 8px;
+}
+
+mat-card-footer {
+  padding: 0 16px 16px;
+}
+
+.sold-out {
+  @include mat.chips-overrides(
+    (
+      elevated-container-color: var(--mat-sys-error-container),
+      label-text-color: var(--mat-sys-on-error-container),
+      outline-color: transparent,
+    )
+  );
+}
+
+.available {
+  font: var(--mat-sys-label-large);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.error pre {
+  padding: 12px;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-high);
+}

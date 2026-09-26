@@ -9,27 +9,38 @@
   },
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/*",
+    "web"
   ],
   "scripts": {
+    "prepare": "lefthook install",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
     "test:affected": "vitest run --changed",
-    "check": "npm run typecheck && npm run lint && npm test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run check --workspace web && npm test",
     "evals": "node evals/run.mjs",
     "skills:sync": "node -e \"require('fs').cpSync('.agents/skills', '.claude/skills', { recursive: true })\""
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@vitest/coverage-v8": "^5.0.0",
     "@types/node": "^26.5.1",
+    "@vitest/coverage-v8": "^5.0.0",
     "eslint": "^10.10.0",
+    "lefthook": "^2.1.14",
+    "prettier": "^3.9.9",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.70.0",
     "vitest": "^5.0.0"
   },
   "allowScripts": {
-    "fsevents": false
+    "fsevents": false,
+    "@parcel/watcher": false,
+    "esbuild": false,
+    "lefthook": false,
+    "lmdb": false,
+    "msgpackr-extract": false
   }
 }

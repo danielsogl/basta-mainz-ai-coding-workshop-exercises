@@ -1,0 +1,30 @@
+# Git hooks: the same rules for people and agents, no prompt needed.
+# Installed by `npm ci` (the root "prepare" script runs `lefthook install`).
+#
+# pre-commit checks only the staged files, so it stays fast.
+# pre-push runs types and lint for the whole repo. Tests stay in the agent's
+# Stop hook and in CI: the known BASELINE: failure would block every push.
+pre-commit:
+  parallel: true
+  jobs:
+    - name: prettier
+      glob: '*.{ts,js,mjs,json,html,scss,css,yml,yaml}'
+      run: npx prettier --check {staged_files}
+    - name: eslint (api, packages, hooks)
+      glob: '*.{ts,js,mjs}'
+      exclude: ['web/**']
+      run: npx eslint {staged_files}
+    - name: eslint (web)
+      root: 'web/'
+      glob: '*.{ts,html}'
+      run: npx eslint {staged_files}
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: typecheck
+      run: npm run typecheck
+    - name: lint
+      run: npm run lint
+    - name: web lint
+      run: npm run lint --workspace web
