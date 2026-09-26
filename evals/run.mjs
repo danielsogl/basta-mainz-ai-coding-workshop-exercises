@@ -23,12 +23,16 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const agent = (process.env.AGENT ?? 'claude -p --permission-mode acceptEdits --setting-sources project,local').split(' ');
+const agent = (process.env.AGENT ?? 'claude -p --permission-mode acceptEdits --setting-sources project,local').split(
+  ' ',
+);
 const args = process.argv.slice(2);
 const runsOverride = args.includes('--runs') ? Number(args[args.indexOf('--runs') + 1]) : undefined;
 const verbose = args.includes('--verbose');
 const filter = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--runs');
-const evals = JSON.parse(readFileSync(join(root, 'evals/evals.json'), 'utf8')).filter((e) => !filter || e.name.includes(filter));
+const evals = JSON.parse(readFileSync(join(root, 'evals/evals.json'), 'utf8')).filter(
+  (e) => !filter || e.name.includes(filter),
+);
 
 const git = (cwd, ...a) => spawnSync('git', a, { cwd, encoding: 'utf8' });
 
@@ -47,7 +51,8 @@ function changedFiles(dir) {
 function runOnce(e) {
   const dir = mkdtempSync(join(tmpdir(), 'eval-'));
   rmSync(dir, { recursive: true });
-  const ref = git(root, 'rev-parse', '--verify', '--quiet', e.checkout).status === 0 ? e.checkout : `origin/${e.checkout}`;
+  const ref =
+    git(root, 'rev-parse', '--verify', '--quiet', e.checkout).status === 0 ? e.checkout : `origin/${e.checkout}`;
   if (git(root, 'worktree', 'add', '--detach', dir, ref).status !== 0) return [`cannot check out ${e.checkout}`];
   try {
     // 'junction' makes this work on Windows without admin rights.
@@ -67,10 +72,12 @@ function runOnce(e) {
     const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
     const failures = [];
     const x = e.expect;
-    if (x.output_contains && !containsAll(output, x.output_contains)) failures.push('output is missing an expected phrase');
+    if (x.output_contains && !containsAll(output, x.output_contains))
+      failures.push('output is missing an expected phrase');
     for (const [file, groups] of Object.entries(x.file_contains ?? {})) {
       const path = join(dir, file);
-      if (!existsSync(path) || !containsAll(readFileSync(path, 'utf8'), groups)) failures.push(`${file} is missing or incomplete`);
+      if (!existsSync(path) || !containsAll(readFileSync(path, 'utf8'), groups))
+        failures.push(`${file} is missing or incomplete`);
     }
     if (x.no_changes) {
       const bad = changedFiles(dir).filter((f) => new RegExp(x.no_changes).test(f));

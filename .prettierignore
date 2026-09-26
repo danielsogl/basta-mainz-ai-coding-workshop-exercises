@@ -1,0 +1,14 @@
+# Build output, caches and lockfiles are never hand-formatted.
+node_modules
+dist
+coverage
+.angular
+test-results
+playwright-report
+package-lock.json
+
+# Prose is reviewed by people, not reflowed by a formatter.
+*.md
+# Installed skills are third-party files pinned by skills-lock.json.
+.agents/skills
+.claude/skills

@@ -46,8 +46,6 @@ describe('calculateOrderTotalCents', () => {
   });
 
   it('rejects a negative unit price', () => {
-    expect(() =>
-      calculateOrderTotalCents({ unitPriceCents: -1, quantity: 1 })
-    ).toThrow();
+    expect(() => calculateOrderTotalCents({ unitPriceCents: -1, quantity: 1 })).toThrow();
   });
 });
