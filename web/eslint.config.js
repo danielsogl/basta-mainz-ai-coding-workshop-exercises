@@ -1,4 +1,5 @@
 // @ts-check
+/// <reference types="node" />
 // Rules instead of prompts: every convention an agent must follow lives here,
 // so `npm run lint` rejects violations no matter who (or what) wrote the code.
 import eslint from '@eslint/js';
