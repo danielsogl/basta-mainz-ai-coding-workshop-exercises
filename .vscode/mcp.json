@@ -1,0 +1,10 @@
+{
+  "servers": {
+    "angular-cli": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/node_modules/@angular/cli/bin/ng.js", "mcp"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}
