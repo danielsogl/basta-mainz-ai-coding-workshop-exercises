@@ -3,7 +3,7 @@ import type { HarnessLoader } from '@angular/cdk/testing';
 import { manualChangeDetection } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import type { ComponentFixture } from '@angular/core/testing';
-import { TestBed } from '@angular/core/testing';
+import { DeferBlockBehavior, DeferBlockState, TestBed } from '@angular/core/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatCardHarness } from '@angular/material/card/testing';
 import { MatProgressBarHarness } from '@angular/material/progress-bar/testing';
@@ -24,7 +24,12 @@ describe('EventsPage', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [provideHttpClientTesting()] });
+    // Manual: the deferred waitlist form stays a placeholder until a test renders it
+    // (waitlist-form.spec covers the form itself).
+    TestBed.configureTestingModule({
+      providers: [provideHttpClientTesting()],
+      deferBlockBehavior: DeferBlockBehavior.Manual,
+    });
     http = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(EventsPage);
     loader = TestbedHarnessEnvironment.loader(fixture);
@@ -76,5 +81,20 @@ describe('EventsPage', () => {
     await fixture.whenStable();
 
     expect(await loader.getAllHarnesses(MatCardHarness.with({ title: 'BASTA! Keynote' }))).toHaveLength(1);
+  });
+
+  it('loads the waitlist form of a sold-out event only when its defer block renders', async () => {
+    (await eventsRequest()).flush(events);
+    await fixture.whenStable();
+
+    const blocks = await fixture.getDeferBlocks();
+    expect(blocks).toHaveLength(1);
+    expect(fixture.nativeElement.querySelector('app-waitlist-form')).toBeNull();
+
+    await blocks[0]?.render(DeferBlockState.Complete);
+    (await vi.waitFor(() => http.expectOne('/api/events/evt-2/waitlist'))).flush({ eventId: 'evt-2', length: 0 });
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.textContent).toContain('Nobody waiting yet');
   });
 });

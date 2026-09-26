@@ -4,10 +4,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { EventsApi } from './events-api';
+import { WaitlistForm } from './waitlist-form';
 
 @Component({
   selector: 'app-events-page',
-  imports: [MatButtonModule, MatCardModule, MatIconModule, MatProgressBarModule],
+  imports: [MatButtonModule, MatCardModule, MatIconModule, MatProgressBarModule, WaitlistForm],
   templateUrl: './events-page.html',
   styleUrl: './events-page.scss',
 })

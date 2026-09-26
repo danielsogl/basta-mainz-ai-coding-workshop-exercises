@@ -37,6 +37,11 @@ mat-card-footer {
   background: var(--mat-sys-error-container);
 }
 
+.waitlist-placeholder {
+  // Roughly the height of the waitlist form, so the card does not jump when it loads.
+  min-height: 128px;
+}
+
 .available {
   font: var(--mat-sys-label-large);
   color: var(--mat-sys-on-surface-variant);

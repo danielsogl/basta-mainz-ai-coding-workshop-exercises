@@ -36,6 +36,12 @@
           <mat-card-footer>
             @if (event.soldOut) {
               <span class="sold-out">Sold out</span>
+              <!-- Signal Forms + form field are only needed for sold-out events: keep them out of the initial bundle. -->
+              @defer (on viewport) {
+                <app-waitlist-form [eventId]="event.id" />
+              } @placeholder {
+                <div class="waitlist-placeholder"></div>
+              }
             } @else {
               <span class="available">{{ event.available }} left</span>
             }

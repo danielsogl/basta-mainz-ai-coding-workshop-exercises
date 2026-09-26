@@ -1,0 +1,27 @@
+form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+mat-form-field {
+  flex: 1 1 200px;
+}
+
+button {
+  height: 56px;
+}
+
+.waiting {
+  margin: 12px 0 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.joined {
+  margin: 12px 0 0;
+  font: var(--mat-sys-label-large);
+  color: var(--mat-sys-primary);
+}
