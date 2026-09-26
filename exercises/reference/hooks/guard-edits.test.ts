@@ -51,6 +51,13 @@ describe('guard-edits hook', () => {
     expect(run({ tool_name: 'Edit', tool_input: { file_path: 'web/src/app/events/events.ts' } })).toBe(0);
     expect(run({ tool_name: 'Write', tool_input: { file_path: 'web/src/app/brand-new.spec.ts' } })).toBe(0);
   });
+  it('denies skipping the git hooks, allows normal commits', () => {
+    expect(run({ tool_name: 'Bash', tool_input: { command: 'git commit --no-verify -m "wip"' } })).toBe(2);
+    expect(run({ tool_name: 'Bash', tool_input: { command: 'git commit -nm "wip"' } })).toBe(2);
+    expect(run({ tool_name: 'Bash', tool_input: { command: 'git push --no-verify' } })).toBe(2);
+    expect(run({ tool_name: 'Bash', tool_input: { command: 'git commit -m "feat: waitlist"' } })).toBe(0);
+    expect(run({ tool_name: 'Bash', tool_input: { command: 'git commit -am "fix: name"' } })).toBe(0);
+  });
   it('judges the target, not the content (a doc may mention package.json)', () => {
     expect(
       run({ tool_name: 'Edit', tool_input: { file_path: 'README.md', new_string: 'see package.json and x.test.ts' } }),

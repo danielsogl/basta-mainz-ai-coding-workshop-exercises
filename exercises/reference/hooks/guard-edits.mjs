@@ -75,6 +75,10 @@ export function decide(raw) {
     // Redirecting errors or output into nowhere (2>&1, 2>/dev/null, > $null)
     // writes nothing: drop it before looking for a write.
     const command = texts.join(' ').replace(/\d?>&\d|\d?>\s*(\/dev\/null|\$null|NUL)\b/gi, '');
+    // --no-verify (or -n on commit) skips the git hooks in lefthook.yml.
+    if (/\bgit\b.*\s(--no-verify|commit\s+(.*\s)?-[a-zA-Z]*n[a-zA-Z]*)\b/.test(command)) {
+      return `skipping the git hooks is not allowed: ${command}. Fix what the hook reports instead.`;
+    }
     if ((TEST_FILE.test(command) || HOOK_SETUP.test(command)) && SHELL_WRITE.test(command)) {
       return `shell command would change a test file or the hook setup: ${command}`;
     }
