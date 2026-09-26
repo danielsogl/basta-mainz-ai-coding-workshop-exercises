@@ -6,8 +6,8 @@ or `jq`.
 
 | Script | Event | What it does |
 |---|---|---|
-| `guard-edits.mjs` | before a tool runs | Blocks changes to **existing** `*.test.ts` files, to the hook setup itself (`exercises/reference/hooks/`, `.claude/settings*.json`, `.github/hooks/`, `.codex/`, `.cursor/hooks.json`, `.vscode/settings.json`) and to the files that decide which tests run (`vitest.config.ts`, `package.json`). Creating a **new** test file is allowed: that is the RED step. Also catches the usual shell workarounds (`sed -i`, `>`, `rm`, `git checkout -- x.test.ts`, `Set-Content`, …) and Codex patches (`*** Update File: x.test.ts`). |
-| `verify-on-stop.mjs` | agent wants to stop | Runs typecheck and the tests affected by the change. If they fail, the agent has to keep working. Skips tests named `BASELINE:` and `FLAKY:` (known, see [`../../bonus-real-world-constraints.md`](../../bonus-real-world-constraints.md)). After three blocks in a row it lets the agent stop and says so on stderr: a test the agent cannot fix belongs to a human. |
+| `guard-edits.mjs` | before a tool runs | Blocks changes to **existing** tests (`*.test.ts`, `*.spec.ts`, anything under `e2e/`), to the hook setup itself (`exercises/reference/hooks/`, `.claude/settings*.json`, `.github/hooks/`, `.codex/`, `.cursor/hooks.json`, `.vscode/settings.json`), to the files that define the checks (`vitest.config.ts`, `playwright.config.ts`, `eslint.config.js`, `.prettierrc*`, `lefthook.yml`, `angular.json`, `package.json`), and `git commit`/`git push` with `--no-verify` or `-n`, which would skip Lefthook. Creating a **new** test file is allowed: that is the RED step. Also catches the usual shell workarounds (`sed -i`, `>`, `rm`, `git checkout -- x.test.ts`, `Set-Content`, …) and Codex patches (`*** Update File: x.test.ts`). |
+| `verify-on-stop.mjs` | agent wants to stop | Runs typecheck and the tests affected by the change, plus `web/`'s lint and unit tests when the change touches `web/`. If they fail, the agent has to keep working. Skips tests named `BASELINE:` and `FLAKY:` (known, see [`../../bonus-real-world-constraints.md`](../../bonus-real-world-constraints.md)). After three blocks in a row it lets the agent stop and says so on stderr: a test the agent cannot fix belongs to a human. |
 
 `guard-edits.mjs` understands the payload shapes of Claude Code
 (`tool_name`/`tool_input.file_path`), VS Code agent mode (`tool_name`,
@@ -27,6 +27,14 @@ every tool call would be denied.)
 The Copilot CLI runs both files when both exist: `.github/hooks/hooks.json`
 and the hooks in `.claude/settings.json`. That is harmless, the guard gives the
 same answer twice and the stop check runs twice.
+
+## Which branches have them on
+
+`main` up to `checkpoint/04-context`: off, you switch them on in Ü5 with the
+commands below. `checkpoint/05-red`, `checkpoint/05-build` and
+`pr/leave-waitlist` ship both configs, so they are on after a checkout.
+Tools read hook configs when a session starts: **restart your agent after
+every `git checkout`**.
 
 ## Install
 
