@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Stop hook: the agent may not end its turn while typecheck or the tests
-// affected by its change are red. Works on macOS, Linux and Windows:
+// affected by its change are red. When the change touches web/, the Angular
+// app's lint and unit tests have to pass too. Works on macOS, Linux and Windows:
 // - Claude Code and Codex (Stop): exit 2 + reason on stderr
 // - .github/hooks/hooks.json (agentStop, pass --copilot): the Copilot CLI and
 //   cloud agent read the top-level {"decision":"block"}, VS Code reads it under
@@ -36,7 +37,10 @@ try {
 } catch {
   // no stdin or no JSON — fine, run the checks anyway
 }
-const session = String(input.session_id ?? input.sessionId ?? input.conversation_id ?? 'default').replace(/[^\w-]/g, '');
+const session = String(input.session_id ?? input.sessionId ?? input.conversation_id ?? 'default').replace(
+  /[^\w-]/g,
+  '',
+);
 // One counter per config: the Copilot CLI also runs the hooks in
 // .claude/settings.json, so one stop can reach this script twice.
 const counterFile = join(tmpdir(), `verify-on-stop-${session}${copilot ? '-copilot' : cursor ? '-cursor' : ''}.txt`);
@@ -48,24 +52,39 @@ const readCount = () => {
   }
 };
 
-function run(script, args) {
-  const result = spawnSync(process.execPath, [resolve(root, script), ...args], { cwd: root, encoding: 'utf8' });
+// Scripts are started with node directly, not through npm: that works the
+// same on Windows, where npm is a .cmd file spawnSync cannot run without a shell.
+function run(script, args, cwd = root) {
+  const result = spawnSync(process.execPath, [resolve(root, script), ...args], { cwd, encoding: 'utf8' });
   return { ok: result.status === 0, output: `${result.stdout ?? ''}${result.stderr ?? ''}` };
 }
+
+const webChanged =
+  spawnSync('git', ['status', '--porcelain', '--', 'web'], { cwd: root, encoding: 'utf8' }).stdout?.trim() !== '';
+const ng = 'node_modules/@angular/cli/bin/ng.js';
+const web = resolve(root, 'web');
 
 const checks = [
   ['typecheck', 'node_modules/typescript/bin/tsc', ['--noEmit']],
   ['affected tests', 'node_modules/vitest/vitest.mjs', ['run', '--changed', '-t', '^(?!.*(BASELINE|FLAKY):)']],
+  ...(webChanged
+    ? [
+        ['web lint', ng, ['lint'], web],
+        ['web unit tests', ng, ['test', '--watch=false'], web],
+      ]
+    : []),
 ];
 
-for (const [name, script, args] of checks) {
-  const { ok, output } = run(script, args);
+for (const [name, script, args, cwd] of checks) {
+  const { ok, output } = run(script, args, cwd);
   if (ok) continue;
   const reason = `${name} failed — fix this before you finish:\n${output.trim().split('\n').slice(-40).join('\n')}`;
   const blocks = readCount() + 1;
   if (blocks > MAX_BLOCKS) {
     rmSync(counterFile, { force: true });
-    process.stderr.write(`verify-on-stop: still red after ${MAX_BLOCKS} rounds, letting the agent stop. A human has to look.\n${reason}\n`);
+    process.stderr.write(
+      `verify-on-stop: still red after ${MAX_BLOCKS} rounds, letting the agent stop. A human has to look.\n${reason}\n`,
+    );
     process.exit(0);
   }
   writeFileSync(counterFile, String(blocks));
@@ -75,7 +94,11 @@ for (const [name, script, args] of checks) {
   }
   if (copilot) {
     process.stdout.write(
-      JSON.stringify({ decision: 'block', reason, hookSpecificOutput: { hookEventName: 'Stop', decision: 'block', reason } }),
+      JSON.stringify({
+        decision: 'block',
+        reason,
+        hookSpecificOutput: { hookEventName: 'Stop', decision: 'block', reason },
+      }),
     );
     process.exit(0);
   }

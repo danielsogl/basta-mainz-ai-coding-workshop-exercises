@@ -6,8 +6,9 @@
 // Codex (PreToolUse, apply_patch) and Cursor (preToolUse).
 //
 // Allowed: reading anything, and creating a test file that does not exist yet
-// (the RED step of red-green). Denied: changing an existing *.test.ts, and
-// any change to the hook setup itself.
+// (the RED step of red-green). Denied: changing an existing test (*.test.ts
+// in the API, *.spec.ts and e2e/ in web/), and any change to the hook setup or
+// to the configs that define the rules (lint, format, test runners, git hooks).
 //
 // Deny = exit 2 plus a reason on stderr, which every one of the three tools
 // treats as "blocked". Allow = exit 0 with no output, so the tool's own
@@ -18,18 +19,20 @@ import { fileURLToPath } from 'node:url';
 import { Buffer } from 'node:buffer';
 import process from 'node:process';
 
-const TEST_FILE = /\.test\.ts\b/;
-// The hook setup, plus the files that decide which tests run: changing
-// vitest.config.ts or the test script switches the verifier off just as well.
+const TEST_FILE = /\.(test|spec)\.ts\b|(^|[\\/\s'"])e2e[\\/]/;
+// The hook setup, plus the files that decide which checks run and what they
+// enforce: changing vitest.config.ts, the ESLint config or a package.json
+// script switches the verifier off just as well as deleting the hook.
 const HOOK_SETUP =
-  /(exercises[\\/]reference[\\/]hooks|\.claude[\\/]settings(\.local)?\.json|\.github[\\/]hooks|\.codex[\\/]|\.cursor[\\/]hooks\.json|\.vscode[\\/]settings\.json|vitest\.config\.[cm]?[jt]s|(^|[\\/\s'"])package\.json)/;
+  /(exercises[\\/]reference[\\/]hooks|\.claude[\\/]settings(\.local)?\.json|\.github[\\/]hooks|\.codex[\\/]|\.cursor[\\/]hooks\.json|\.vscode[\\/]settings\.json|(vitest|playwright)\.config\.[cm]?[jt]s|eslint\.config\.[cm]?[jt]s|\.prettierrc|lefthook\.ya?ml|angular\.json|(^|[\\/\s'"])package\.json)/;
 // ponytail: name-based tool classification; add names here when a tool ships
 // a new edit or shell tool.
 const EDIT_TOOL = /edit|write|create|replace|patch|insert|delete|rename|move/i;
 const SHELL_TOOL = /^(bash|shell|powershell|run_?in_?terminal|execute|exec)$/i;
 // ponytail: shell commands are matched by pattern, not parsed — a determined
 // agent can still get around this; the hook catches the usual sed/echo/rm moves.
-const SHELL_WRITE = /(>|\s-delete\b|\bsed\s+-i|\bperl\s+-i|\btee\b|\brm\b|\bmv\b|\bcp\b|\bgit\s+(checkout|restore)\b|Set-Content|Out-File|Remove-Item|Move-Item|Copy-Item)/;
+const SHELL_WRITE =
+  /(>|\s-delete\b|\bsed\s+-i|\bperl\s+-i|\btee\b|\brm\b|\bmv\b|\bcp\b|\bgit\s+(checkout|restore)\b|Set-Content|Out-File|Remove-Item|Move-Item|Copy-Item)/;
 
 function parseInput(raw) {
   const data = JSON.parse(raw);
@@ -102,9 +105,10 @@ export function decide(raw) {
     return 'agents may not change the hook setup or the test config. Ask a human.';
   }
   if (targets.some((t) => TEST_FILE.test(t))) {
-    const isNewFile = /create|write/i.test(toolName) && path && !existsSync(isAbsolute(path) ? path : resolve(cwd, path));
+    const isNewFile =
+      /create|write/i.test(toolName) && path && !existsSync(isAbsolute(path) ? path : resolve(cwd, path));
     if (isNewFile) return undefined;
-    return `agents may not change existing tests (${path ?? 'a *.test.ts file'}). If a test looks wrong, stop and tell the human why.`;
+    return `agents may not change existing tests (${path ?? 'a test file'}). If a test looks wrong, stop and tell the human why.`;
   }
   return undefined;
 }
@@ -122,7 +126,11 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       JSON.stringify({
         permissionDecision: 'deny',
         permissionDecisionReason: reason,
-        hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: reason },
+        hookSpecificOutput: {
+          hookEventName: 'PreToolUse',
+          permissionDecision: 'deny',
+          permissionDecisionReason: reason,
+        },
       }),
     );
     process.exit(2);
