@@ -86,6 +86,15 @@ describe('Tickets API', () => {
     expect(body.total).toBe(119);
   });
 
+  it('lists all events with their availability', async () => {
+    const res = await fetch(`${base}/events`);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual([
+      { id: 'evt-1', name: 'Conference Day 1', capacity: 100, sold: 100, available: 0, soldOut: true },
+      { id: 'evt-2', name: 'Conference Day 2', capacity: 100, sold: 40, available: 60, soldOut: false },
+    ]);
+  });
+
   it('reports a sold-out event once the availability cache is warm', async () => {
     const res = await availability('evt-1');
     expect(res.status).toBe(200);

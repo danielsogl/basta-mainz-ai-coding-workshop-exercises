@@ -10,6 +10,9 @@
 ### Health (answers "healthy"; the BASELINE test expects "ok")
 GET {{base}}/health
 
+### All events with availability (the web app's list)
+GET {{base}}/events
+
 ### Price for 2 tickets at 10.00 EUR, VAT included
 POST {{base}}/price
 Content-Type: application/json

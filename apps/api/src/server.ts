@@ -21,6 +21,11 @@ async function readJsonBody(req: IncomingMessage): Promise<Record<string, unknow
   return JSON.parse(Buffer.concat(chunks).toString('utf8')) as Record<string, unknown>;
 }
 
+function availabilityOf(event: EventRecord) {
+  const available = event.capacity - event.sold;
+  return { capacity: event.capacity, sold: event.sold, available, soldOut: available <= 0 };
+}
+
 function sendJson(res: ServerResponse, status: number, body: unknown): void {
   const payload = JSON.stringify(body);
   res.writeHead(status, { 'Content-Type': 'application/json' });
@@ -68,6 +73,15 @@ export function createApp(): Server {
       return;
     }
 
+    if (req.method === 'GET' && url.pathname === '/events') {
+      sendJson(
+        res,
+        200,
+        seedEvents.map((event) => ({ id: event.id, name: event.name, ...availabilityOf(event) })),
+      );
+      return;
+    }
+
     const availabilityMatch = /^\/events\/([^/]+)\/availability$/.exec(url.pathname);
     if (req.method === 'GET' && availabilityMatch) {
       if (!availabilityCacheWarm) {
@@ -79,14 +93,7 @@ export function createApp(): Server {
         sendJson(res, 404, { error: 'event not found' });
         return;
       }
-      const available = event.capacity - event.sold;
-      sendJson(res, 200, {
-        eventId: event.id,
-        capacity: event.capacity,
-        sold: event.sold,
-        available,
-        soldOut: available <= 0,
-      });
+      sendJson(res, 200, { eventId: event.id, ...availabilityOf(event) });
       return;
     }
 
