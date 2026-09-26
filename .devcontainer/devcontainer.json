@@ -1,0 +1,17 @@
+{
+  // Fallback for a broken laptop setup and for remote participants: open the
+  // repo in a GitHub Codespace and everything below is ready.
+  "name": "Tickets workshop",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:24",
+  "postCreateCommand": "npm ci && npm install -g @github/copilot @anthropic-ai/claude-code && npx lefthook install",
+  "forwardPorts": [3000, 4200],
+  "portsAttributes": {
+    "3000": { "label": "Tickets API" },
+    "4200": { "label": "Web app" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["angular.ng-template", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "humao.rest-client"]
+    }
+  }
+}
