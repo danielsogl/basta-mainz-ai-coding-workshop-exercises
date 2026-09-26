@@ -1,7 +1,12 @@
-import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import type { HarnessLoader } from '@angular/cdk/testing';
+import { manualChangeDetection } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
+import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatCardHarness } from '@angular/material/card/testing';
+import { MatProgressBarHarness } from '@angular/material/progress-bar/testing';
 import type { TicketEvent } from './events.model';
 import { EventsPage } from './events-page';
 
@@ -10,50 +15,66 @@ const events: TicketEvent[] = [
   { id: 'evt-2', name: 'BASTA! Keynote', capacity: 100, sold: 100, available: 0, soldOut: true },
 ];
 
+// Harnesses wait for fixture.whenStable(), which also waits for open HTTP requests.
+// So: flush the request first, then use harnesses. manualChangeDetection() is only
+// used while a request is deliberately left open (loading state, retry click).
 describe('EventsPage', () => {
   let fixture: ComponentFixture<EventsPage>;
+  let loader: HarnessLoader;
   let http: HttpTestingController;
-  const text = () => (fixture.nativeElement as HTMLElement).textContent ?? '';
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
-    });
+    TestBed.configureTestingModule({ providers: [provideHttpClientTesting()] });
     http = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(EventsPage);
-    // Not whenStable(): that would wait for the pending request we want to control.
-    fixture.detectChanges();
+    loader = TestbedHarnessEnvironment.loader(fixture);
   });
 
   afterEach(() => http.verify());
 
-  it('shows a loading indicator until events arrive', () => {
-    expect(fixture.nativeElement.querySelector('[aria-label="Loading events"]')).not.toBeNull();
-    http.expectOne('/api/events').flush([]);
-  });
+  /** Waits until the page has sent GET /api/events (after its first render or a reload). */
+  const eventsRequest = () => vi.waitFor(() => http.expectOne('/api/events'));
 
-  it('renders each event with its sales and a sold-out chip', async () => {
-    http.expectOne('/api/events').flush(events);
+  it('shows a loading indicator until events arrive', async () => {
+    const request = await eventsRequest();
+    await manualChangeDetection(async () => {
+      const bar = await loader.getHarness(MatProgressBarHarness);
+      expect(await bar.getMode()).toBe('indeterminate');
+    });
+
+    request.flush([]);
     await fixture.whenStable();
 
-    expect(text()).toContain('Angular Deep Dive');
-    expect(text()).toContain('20 of 50 sold');
-    expect(text()).toContain('30 left');
-    expect(fixture.nativeElement.querySelectorAll('.sold-out')).toHaveLength(1);
+    expect(await loader.getAllHarnesses(MatProgressBarHarness)).toHaveLength(0);
+  });
+
+  it('renders each event with its sales and marks sold-out events', async () => {
+    (await eventsRequest()).flush(events);
+    await fixture.whenStable();
+
+    const card = await loader.getHarness(MatCardHarness.with({ title: 'Angular Deep Dive' }));
+    expect(await card.getSubtitleText()).toBe('20 of 50 sold');
+    expect(await card.getText()).toContain('30 left');
+    const bar = await card.getHarness(MatProgressBarHarness);
+    expect(await bar.getValue()).toBe(40);
+
+    expect(await card.getText()).not.toContain('Sold out');
+    const soldOut = await loader.getHarness(MatCardHarness.with({ title: 'BASTA! Keynote' }));
+    expect(await soldOut.getText()).toContain('Sold out');
   });
 
   it('shows how to start the API when loading fails, and retries', async () => {
-    http.expectOne('/api/events').flush(null, { status: 504, statusText: 'Gateway Timeout' });
+    (await eventsRequest()).flush(null, { status: 504, statusText: 'Gateway Timeout' });
     await fixture.whenStable();
 
-    expect(text()).toContain('Could not load events');
-    expect(text()).toContain('npm start --workspace apps/api');
+    const error = await loader.getHarness(MatCardHarness.with({ title: 'Could not load events' }));
+    expect(await error.getText()).toContain('npm start --workspace apps/api');
 
-    (fixture.nativeElement as HTMLElement).querySelector('button')?.click();
-    fixture.detectChanges();
-    http.expectOne('/api/events').flush(events);
+    const retry = await loader.getHarness(MatButtonHarness.with({ text: 'Retry' }));
+    await manualChangeDetection(() => retry.click());
+    (await eventsRequest()).flush(events);
     await fixture.whenStable();
 
-    expect(text()).toContain('BASTA! Keynote');
+    expect(await loader.getAllHarnesses(MatCardHarness.with({ title: 'BASTA! Keynote' }))).toHaveLength(1);
   });
 });

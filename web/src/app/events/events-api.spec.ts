@@ -1,4 +1,3 @@
-import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -11,7 +10,7 @@ describe('EventsApi', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClientTesting()],
     });
     api = TestBed.inject(EventsApi);
     http = TestBed.inject(HttpTestingController);
@@ -25,8 +24,8 @@ describe('EventsApi', () => {
     ];
 
     const resource = TestBed.runInInjectionContext(() => api.events());
-    TestBed.tick();
-    http.expectOne('/api/events').flush(events);
+    const request = await vi.waitFor(() => http.expectOne('/api/events'));
+    request.flush(events);
     await TestBed.inject(ApplicationRef).whenStable();
 
     expect(resource.value()).toEqual(events);

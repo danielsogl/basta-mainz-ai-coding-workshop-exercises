@@ -1,6 +1,8 @@
 import type { Routes } from '@angular/router';
+import { EventsPage } from './events/events-page';
 
 export const routes: Routes = [
-  { path: '', loadComponent: () => import('./events/events-page').then((m) => m.EventsPage) },
+  // The landing page is loaded eagerly; lazy-load feature pages added later.
+  { path: '', component: EventsPage, title: 'Events' },
   { path: '**', redirectTo: '' },
 ];

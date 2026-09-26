@@ -17,11 +17,11 @@
       <button mat-flat-button type="button" (click)="events.reload()">Retry</button>
     </mat-card-actions>
   </mat-card>
-} @else {
+} @else if (events.hasValue()) {
   <ul class="grid">
     @for (event of events.value(); track event.id) {
       <li>
-        <mat-card appearance="outlined" [attr.aria-label]="event.name">
+        <mat-card appearance="outlined">
           <mat-card-header>
             <mat-card-title>{{ event.name }}</mat-card-title>
             <mat-card-subtitle>{{ event.sold }} of {{ event.capacity }} sold</mat-card-subtitle>
@@ -35,9 +35,7 @@
           </mat-card-content>
           <mat-card-footer>
             @if (event.soldOut) {
-              <mat-chip-set aria-label="Status">
-                <mat-chip class="sold-out">Sold out</mat-chip>
-              </mat-chip-set>
+              <span class="sold-out">Sold out</span>
             } @else {
               <span class="available">{{ event.available }} left</span>
             }

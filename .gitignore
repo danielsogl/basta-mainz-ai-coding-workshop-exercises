@@ -2,6 +2,7 @@ node_modules/
 dist/
 .vitest/
 coverage/
+.angular/
 *.log
 .DS_Store
 Thumbs.db
