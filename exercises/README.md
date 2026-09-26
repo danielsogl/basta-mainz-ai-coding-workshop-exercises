@@ -18,7 +18,7 @@ agent (GitHub Copilot, Claude Code, Codex, Cursor, …). Ü stands for
 | [Ü3](./03-write-spec.md) | 2 · Design | 25 min | `write-spec` | `docs/waitlist/spec.md` | `checkpoint/03-spec` |
 | [Ü4](./04-context-file.md) | 2 · Design | 20 min | – | `AGENTS.md`, `packages/pricing/AGENTS.md` | `checkpoint/04-context` |
 | [Ü5](./05-red-green.md) | 3 · Build & Test | 40 min | `red-green` | waitlist, tests, hooks | `checkpoint/05-red`, `checkpoint/05-build` |
-| [Ü6](./06-write-a-skill.md) | 3 · Build & Test | 15 min | your own | `add-api-endpoint` skill | – |
+| [Ü6](./06-write-a-skill.md) | 3 · Build & Test | 15 min | your own | `add-api-endpoint` or `add-web-component` skill | – |
 | [Ü7](./07-review-gate.md) | 4 · Review | 25 min | `review-against-spec` | review of `pr/leave-waitlist` | – |
 | [Ü8](./08-30-day-plan.md) | 4 · Maintain | 10 min | – | your 30-day plan | – |
 
@@ -58,6 +58,14 @@ npx skills add danielsogl/basta-mainz-ai-coding-workshop-exercises
 ```
 
 If your tool does not load skills, paste the `SKILL.md` as your first message.
+
+The folder also holds `angular-developer`, the official Angular skill,
+installed with the skills CLI for Copilot and Claude Code and pinned in
+`skills-lock.json`:
+
+```sh
+npx skills add angular/skills -s angular-developer -a claude-code -a github-copilot --copy
+```
 
 `.claude/skills/` is a copy of `.agents/skills/` (Claude Code only looks in
 `.claude/`). After changing or adding a skill, run `npm run skills:sync`.

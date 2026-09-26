@@ -12,8 +12,13 @@ with Claude Code, GitHub Copilot or any other harness.
 packages/pricing/         ticket price, discount codes, group rates, VAT (well tested)
 packages/legacy-invoice/  older, untyped, undocumented, no tests on purpose
 apps/api/                 a small HTTP API over both packages
+web/                      optional Angular 22 + Material UI for the API
 exercises/                the hands-on exercises (start here)
+.agents/skills/           workshop skills + the official Angular skill (copied to .claude/skills/)
 ```
+
+Everything is TypeScript. The API is the main track; `web/` is an optional
+extra for everyone who wants to see a UI, not only HTTP requests.
 
 See [`exercises/README.md`](./exercises/README.md) for the exercises.
 
@@ -22,15 +27,27 @@ See [`exercises/README.md`](./exercises/README.md) for the exercises.
 Do this at home, not on the conference Wi-Fi. It takes 10 minutes.
 
 1. Install Node.js 24+ and Git.
-2. Clone this repo, run `npm ci`, then `npm run check`. One or two failing
-   tests are expected (see below); anything else, open an issue.
-3. Start your agent (Copilot, Claude Code, Codex, Cursor, …) in the repo
-   root and ask it "What does this repo do?". If that works, you are ready.
+2. Install an agent that runs in the terminal. **Recommended: the GitHub
+   Copilot CLI** (`npm install -g @github/copilot`, then `copilot` and `/login`).
+   It supports everything the day uses (AGENTS.md, skills, MCP, hooks) the
+   same way on every OS, which the IDE plugins do not all do yet (Visual Studio
+   has no agent hooks). Claude Code works just as well
+   (`npm install -g @anthropic-ai/claude-code`). Codex and Cursor work too; the
+   exercises name their equivalents.
+3. Clone this repo, run `npm ci`, then `npm run check`. One or two failing
+   tests are expected (see below); anything else, open an issue. `npm ci` also
+   installs the git hooks (Lefthook).
+4. Start your agent in the repo root and ask it "What does this repo do?". If
+   that works, you are ready.
+5. Optional, for the web app's end-to-end tests: `npx playwright install chromium`.
 
 On Windows: the Copilot CLI needs PowerShell 7 (`winget install
 Microsoft.PowerShell`); Windows PowerShell 5.1 is not enough. Claude Code uses
 Git Bash from Git for Windows if it is installed, otherwise PowerShell. The
 commands in the exercises work in both.
+
+Laptop not cooperating, or joining remotely? Open the repo in a GitHub
+Codespace: `.devcontainer/` installs Node, both agents and the dependencies.
 
 No working agent or no licence? Come anyway: you work in pairs, one agent
 per pair.
@@ -41,6 +58,13 @@ per pair.
 2. Find a partner. You work in pairs, one agent, and swap the driver after every exercise.
 3. Start at [`exercises/01-harness-check.md`](./exercises/01-harness-check.md).
 4. Fell behind? `git stash -u; git checkout checkpoint/<name>` (list in `exercises/README.md`).
+
+## This repo or your own
+
+Every exercise works on this repo, and every card ends with "In your own repo
+instead". Use your own repo if you have one you know well, but keep two things
+in mind: the checkpoint branches only exist here, and Ü7 needs this repo's
+prepared pull request.
 
 ## Why TypeScript at a .NET conference?
 
@@ -94,7 +118,40 @@ exercise). Coverage percentage says nothing about test quality.
 - `npm run test:affected`: `vitest run --changed`, only the tests touched by
   your current (uncommitted or last-commit) change. Used by the example
   `Stop` hook in `exercises/reference/hooks/`.
-- `npm run check`: all three, in order.
+- `npm run format` / `npm run format:check`: Prettier for code and config
+  (Markdown is left alone).
+- `npm run check`: typecheck, lint, format check, the web app's checks, then
+  the tests.
+
+## Rules the agent cannot talk its way around
+
+Prompts and `AGENTS.md` are requests. These are enforced, for people and
+agents alike, without anyone having to ask:
+
+| Rule | Where | Runs |
+|---|---|---|
+| Strict TypeScript, strict Angular templates | `tsconfig.json`, `web/tsconfig.json` | typecheck, build |
+| Lint rules with a reason each (signals, OnPush, no `any`, accessibility) | `eslint.config.js`, `web/eslint.config.js` | lint |
+| One code format | `.prettierrc.json` | format check |
+| Staged files are formatted and linted; types and lint pass before push | `lefthook.yml` | every commit and push |
+| Existing tests and the rule configs are off limits for the agent; checks must pass before it stops | `exercises/reference/hooks/` | every agent turn, after Ü5 |
+| Everything above, on Linux, Windows and macOS | `.github/workflows/ci.yml` | every push |
+
+## The web app
+
+`web/` is an Angular 22 app with Angular Material, Vitest, Playwright,
+angular-eslint and Prettier. It lists the events and, from
+`checkpoint/05-build` on, lets you join the waitlist of a sold-out event.
+
+```sh
+npm start --workspace apps/api   # API on http://localhost:3000
+npm start --workspace web        # http://localhost:4200, /api is proxied to the API
+```
+
+For agents: the official `angular-developer` skill is installed (from
+`angular/skills`, pinned in `skills-lock.json`), and `.mcp.json` /
+`.vscode/mcp.json` register the Angular CLI MCP server for Copilot CLI, Claude
+Code and VS Code. See [`web/README.md`](./web/README.md).
 
 ## Try the API from your editor
 

@@ -19,8 +19,8 @@ team gets for free.
    shape, validation at the boundary, where tests go, what "done" means.
    Keep it under 40 lines.
 3. Run `npm run skills:sync`. It copies `.agents/skills/` to `.claude/skills/`, where Claude Code looks for skills.
-4. Fresh session, **without naming the skill**: *"Add `GET /events` that
-   lists all events with id and name."* Did the skill trigger? If not,
+4. Fresh session, **without naming the skill**: *"Add `GET /events/:id` that
+   returns one event with its availability."* Did the skill trigger? If not,
    sharpen the `description` and leave the body.
 
 ## Done when
@@ -30,6 +30,15 @@ team gets for free.
 
 This is your first eval: a fixed prompt, and a check whether the agent
 behaved as intended. [`evals/`](../evals/) automates that.
+
+## UI instead of API
+
+Prefer the frontend? Write `.agents/skills/add-web-component/SKILL.md` for
+`web/` instead: where components live, signals and `httpResource`, Angular
+Material, where the `*.spec.ts` goes, and that `npm run check --workspace web`
+must pass. The official `angular-developer` skill is already installed; yours
+only adds what is specific to this repo. Test prompt: *"Show the free seats
+as a number next to the progress bar."*
 
 ## Stretch
 

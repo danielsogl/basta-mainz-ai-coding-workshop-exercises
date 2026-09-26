@@ -45,6 +45,13 @@ verification instead of trusting the agent's good will.
 Break `apps/api/src/server.ts` on purpose, end the turn, and watch the `Stop`
 hook send the agent back to fix it without you explaining anything.
 
+**UI stretch.** Once the API is green, let the agent show the waitlist in
+`web/`: a join form on sold-out events and the number of people waiting.
+Same rule, test first: a new `*.spec.ts`, then the component. The
+`angular-developer` skill and the Angular lint rules steer the code without you
+saying "use signals". Compare with `web/src/app/events/` on
+`checkpoint/05-build`.
+
 ## Behind?
 
 `git stash -u; git checkout checkpoint/05-red` (tests written, RED, hooks on) or
