@@ -6,8 +6,8 @@ import type { TicketEvent } from './events.model';
 import { EventsPage } from './events-page';
 
 const events: TicketEvent[] = [
-  { id: 1, name: 'Angular Deep Dive', capacity: 50, sold: 20, available: 30, soldOut: false },
-  { id: 2, name: 'BASTA! Keynote', capacity: 100, sold: 100, available: 0, soldOut: true },
+  { id: 'evt-1', name: 'Angular Deep Dive', capacity: 50, sold: 20, available: 30, soldOut: false },
+  { id: 'evt-2', name: 'BASTA! Keynote', capacity: 100, sold: 100, available: 0, soldOut: true },
 ];
 
 describe('EventsPage', () => {

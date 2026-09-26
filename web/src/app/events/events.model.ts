@@ -1,6 +1,6 @@
 /** One row of `GET /events`. */
 export interface TicketEvent {
-  id: number;
+  id: string;
   name: string;
   capacity: number;
   sold: number;

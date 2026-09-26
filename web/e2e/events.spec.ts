@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 const events = [
-  { id: 1, name: 'Angular Deep Dive', capacity: 50, sold: 20, available: 30, soldOut: false },
-  { id: 2, name: 'BASTA! Keynote', capacity: 100, sold: 100, available: 0, soldOut: true },
+  { id: 'evt-1', name: 'Angular Deep Dive', capacity: 50, sold: 20, available: 30, soldOut: false },
+  { id: 'evt-2', name: 'BASTA! Keynote', capacity: 100, sold: 100, available: 0, soldOut: true },
 ];
 
 test('lists events with how many tickets are sold', async ({ page }) => {

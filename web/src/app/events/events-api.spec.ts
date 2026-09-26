@@ -21,7 +21,7 @@ describe('EventsApi', () => {
 
   it('loads events from /api/events', async () => {
     const events: TicketEvent[] = [
-      { id: 1, name: 'BASTA! Keynote', capacity: 100, sold: 100, available: 0, soldOut: true },
+      { id: 'evt-1', name: 'BASTA! Keynote', capacity: 100, sold: 100, available: 0, soldOut: true },
     ];
 
     const resource = TestBed.runInInjectionContext(() => api.events());
