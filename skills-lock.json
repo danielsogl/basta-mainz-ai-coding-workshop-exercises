@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "skills": {
+    "angular-developer": {
+      "source": "angular/skills",
+      "sourceType": "github",
+      "skillPath": "angular-developer/SKILL.md",
+      "computedHash": "0850aa966b6a7da1151daa9d0ef2081bf397f052573a35c1643fb92b948f0f00"
+    },
+    "capture-intent": {
+      "source": "./.agents/skills/capture-intent",
+      "sourceType": "local",
+      "computedHash": "c5098f3654a7126a89f4cacc33252794d95597eafbb076edde3f5f61f407d9d0"
+    },
+    "red-green": {
+      "source": "./.agents/skills/red-green",
+      "sourceType": "local",
+      "computedHash": "dc2f12b0dde7d586c038022c754cd4cce62511c8de9cc9d88837d44842692186"
+    },
+    "review-against-spec": {
+      "source": "./.agents/skills/review-against-spec",
+      "sourceType": "local",
+      "computedHash": "d2241a22fa554c0c3df267c0c4bf0e22e68a39164b8f294e336d4a73dd213cd5"
+    },
+    "write-spec": {
+      "source": "./.agents/skills/write-spec",
+      "sourceType": "local",
+      "computedHash": "71f82cd05db7b0f6d06af11fcea684aeacbbdee1071ca4a516ef253ea26e9f17"
+    }
+  }
+}
