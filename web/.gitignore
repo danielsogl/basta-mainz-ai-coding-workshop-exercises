@@ -1,0 +1,6 @@
+# Everything else is in the root .gitignore.
+/out-tsc
+/test-results
+/playwright-report
+/blob-report
+__screenshots__/

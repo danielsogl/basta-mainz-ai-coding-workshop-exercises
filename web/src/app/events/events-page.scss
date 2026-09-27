@@ -1,0 +1,50 @@
+:host {
+  display: block;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 8px 16px 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+mat-card {
+  height: 100%;
+}
+
+mat-card-content {
+  padding-block: 16px 8px;
+}
+
+mat-card-footer {
+  padding: 0 16px 16px;
+}
+
+// A plain label, not mat-chip: MatChips pulls in @angular/forms and MatFormField, which
+// would drag the deferred waitlist form's dependencies back into the initial bundle.
+.sold-out {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font: var(--mat-sys-label-large);
+  color: var(--mat-sys-on-error-container);
+  background: var(--mat-sys-error-container);
+}
+
+.available {
+  font: var(--mat-sys-label-large);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.error pre {
+  padding: 12px;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-high);
+}

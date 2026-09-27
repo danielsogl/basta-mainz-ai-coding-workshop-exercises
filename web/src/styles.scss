@@ -1,0 +1,31 @@
+@use '@angular/material' as mat;
+
+html {
+  // light-dark(): follows the OS setting, no toggle needed.
+  color-scheme: light dark;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+mat-toolbar {
+  @include mat.toolbar-overrides(
+    (
+      container-background-color: var(--mat-sys-surface-container),
+    )
+  );
+}
+
+body {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface);
+  background: var(--mat-sys-surface);
+}
