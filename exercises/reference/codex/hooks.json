@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write",
+        "hooks": [{ "type": "command", "command": "node exercises/reference/hooks/guard-edits.mjs" }]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [{ "type": "command", "command": "node exercises/reference/hooks/verify-on-stop.mjs", "timeout": 120 }]
+      }
+    ]
+  }
+}

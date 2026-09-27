@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "node exercises/reference/hooks/guard-edits.mjs",
+        "powershell": "node exercises/reference/hooks/guard-edits.mjs"
+      }
+    ],
+    "agentStop": [
+      {
+        "type": "command",
+        "bash": "node exercises/reference/hooks/verify-on-stop.mjs --copilot",
+        "powershell": "node exercises/reference/hooks/verify-on-stop.mjs --copilot",
+        "timeoutSec": 120
+      }
+    ]
+  }
+}
